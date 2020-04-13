@@ -1,7 +1,9 @@
 import os
+
 import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
+import asyncio
 
 Client = commands.Bot(command_prefix='$')
 
@@ -21,6 +23,45 @@ async def report(ctx, *arg):
 @Client.command()
 async def clear(ctx, arg):
     await ctx.channel.purge(limit=int(arg))
+
+
+#Uprawienia są pod osoby mające możliwość banowanie, na obecną chwile nie mam moderatorów dlatego uważałem to za zbędne.
+@Client.command()
+@commands.has_permissions(ban_members = True)
+async def mute(ctx, user:discord.Member, time:int):
+    await user.edit(mute=True)
+    await asyncio.sleep(time)
+    await user.edit(mute=False)
+        
+@Client.command()
+@commands.has_permissions(ban_members = True)   
+async def unmute(ctx, user:discord.Member):
+    await user.edit(mute=False)
+
+
+
+@Client.command()
+@commands.has_permissions(ban_members = True)  
+async def kick(ctx, user:discord.Member,time:int):
+    await user.edit(voice_channel = None)
+    await user.add_roles(discord.utils.get(user.guild.roles, name='Kick'))
+    await asyncio.sleep(time)
+    await user.remove_roles(discord.utils.get(user.guild.roles, name='Kick'))
+
+@Client.command()
+@commands.has_permissions(ban_members = True)  
+async def ban(ctx, user:discord.Member,time:int):
+    await user.edit(voice_channel = None)
+    await user.add_roles(discord.utils.get(user.guild.roles, name='Kick'))
+    time = time * 60
+    await asyncio.sleep(time)
+    await user.remove_roles(discord.utils.get(user.guild.roles, name='Kick'))
+
+@Client.command()
+@commands.has_permissions(ban_members = True)  
+async def unban(ctx, user:discord.Member,time:int):
+    await user.remove_roles(discord.utils.get(user.guild.roles, name='Kick'))
+
 
 
 
